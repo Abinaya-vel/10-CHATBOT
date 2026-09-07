@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TravelMate AI</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,Arial,sans-serif;background:linear-gradient(135deg,#f5f3ff,#eef2ff);min-height:100vh;display:flex;justify-content:center;align-items:center;color:#1f2937}
+.card{width:min(920px,94vw);height:min(760px,92vh);background:#fff;border-radius:28px;box-shadow:0 20px 60px rgba(31,41,55,.15);display:flex;flex-direction:column;overflow:hidden}
+.header{padding:24px 28px;background:linear-gradient(135deg,#6d28d9,#4f46e5);color:#fff}
+.header h1{margin:0;font-size:28px} .header p{margin:6px 0 0;opacity:.9}
+.chat{flex:1;padding:24px;overflow-y:auto;background:#fafafa}
+.msg{max-width:78%;padding:13px 16px;margin:10px 0;border-radius:18px;line-height:1.5;white-space:pre-wrap}
+.user{margin-left:auto;background:#4f46e5;color:#fff;border-bottom-right-radius:5px}
+.bot{background:#eeeef7;border-bottom-left-radius:5px}
+.form{display:flex;gap:10px;padding:18px;background:#fff;border-top:1px solid #eee}
+input{flex:1;border:1px solid #ddd;border-radius:15px;padding:15px;font-size:16px;outline:none}
+button{border:0;border-radius:15px;padding:0 24px;background:#5b21b6;color:#fff;font-weight:700;cursor:pointer}
+button:hover{opacity:.9}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="header"><h1>🤖 TravelMate AI</h1><p>Travel planning assistant</p></div>
+  <div id="chat" class="chat">
+    <div class="msg bot">Hi! I'm TravelMate AI. How can I help you today?</div>
+  </div>
+  <form id="form" class="form">
+    <input id="message" placeholder="Type your message..." autocomplete="off">
+    <button type="submit">Send</button>
+  </form>
+</div>
+<script>
+const form=document.getElementById("form"), input=document.getElementById("message"), chat=document.getElementById("chat");
+function add(text, cls) {
+  const d=document.createElement("div"); d.className="msg "+cls; d.textContent=text;
+  chat.appendChild(d); chat.scrollTop=chat.scrollHeight;
+}
+form.addEventListener("submit", async e => {
+  e.preventDefault();
+  const message=input.value.trim(); if(!message) return;
+  add(message,"user"); input.value="";
+  add("Thinking...","bot");
+  const thinking=chat.lastElementChild;
+  try {
+    const r=await fetch("/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message})});
+    const data=await r.json(); thinking.textContent=data.reply || "No response.";
+  } catch(err) { thinking.textContent="Connection error. Please try again."; }
+});
+</script>
+</body>
+</html>
